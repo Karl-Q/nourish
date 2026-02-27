@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nourish — Fuel Your Best Self</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal-deep: #0a4a4a;
+    --teal-mid: #0d7377;
+    --teal-bright: #14a085;
+    --teal-light: #1abc9c;
+    --sea-glass: #a8d8d8;
+    --foam: #e0f5f5;
+    --cream: #f8fefd;
+    --gold: #f0c040;
+    --coral: #ff6b6b;
+    --text-dark: #0d2d2d;
+    --text-mid: #2e6666;
+    --text-light: #6aadad;
+    --card-bg: rgba(255,255,255,0.72);
+    --card-border: rgba(20,160,133,0.18);
+    --shadow: 0 8px 40px rgba(10,74,74,0.13);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #0a4a4a 0%, #0d7377 30%, #14a085 60%, #1abc9c 100%);
+    min-height: 100vh; color: var(--text-dark); overflow-x: hidden;
+  }
+  .bg-blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.18; pointer-events: none; z-index: 0; }
+  .blob1 { width: 500px; height: 500px; background: #1de9b6; top: -100px; left: -100px; animation: float1 12s ease-in-out infinite; }
+  .blob2 { width: 400px; height: 400px; background: #00acc1; bottom: -80px; right: -80px; animation: float2 15s ease-in-out infinite; }
+  .blob3 { width: 300px; height: 300px; background: #a8d8d8; top: 40%; left: 60%; animation: float1 10s ease-in-out infinite reverse; }
+  @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,40px) scale(1.05)} }
+  @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-40px,-20px) scale(1.08)} }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+  header { padding: 36px 0 20px; text-align: center; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 3.2rem; font-weight: 900; color: #fff; letter-spacing: -1px; text-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+  .logo span { color: var(--gold); }
+  .tagline { color: var(--sea-glass); font-size: 1rem; margin-top: 6px; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; }
+
+  .goal-bar {
+    background: var(--card-bg); backdrop-filter: blur(18px);
+    border: 1.5px solid var(--card-border); border-radius: 20px;
+    padding: 20px 30px; margin: 20px 0 28px;
+    display: flex; align-items: center; gap: 20px; box-shadow: var(--shadow); flex-wrap: wrap;
+  }
+  .goal-label { font-size: 0.85rem; font-weight: 600; color: var(--teal-mid); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap; }
+  .goal-display { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; color: var(--teal-deep); line-height: 1; }
+  .goal-display span { font-size: 1rem; font-family: 'DM Sans', sans-serif; color: var(--text-light); margin-left: 4px; }
+  .goal-controls { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+  .goal-input { width: 110px; padding: 10px 14px; border-radius: 12px; border: 2px solid var(--teal-light); font-size: 1rem; font-family: 'DM Sans', sans-serif; color: var(--teal-deep); background: var(--cream); outline: none; transition: border-color 0.2s; }
+  .goal-input:focus { border-color: var(--teal-mid); }
+
+  .btn { padding: 10px 22px; border-radius: 12px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 600; transition: transform 0.15s, box-shadow 0.15s; }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(10,74,74,0.2); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(135deg, var(--teal-mid), var(--teal-bright)); color: #fff; }
+  .btn-secondary { background: var(--foam); color: var(--teal-mid); }
+  .btn-gold { background: linear-gradient(135deg, #f0c040, #f9a825); color: var(--teal-deep); }
+
+  .progress-section { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .ring-wrap { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--sea-glass); stroke-width: 7; }
+  .ring-fill { fill: none; stroke: var(--teal-bright); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1), stroke 0.4s; }
+  .ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-pct { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--teal-deep); line-height: 1; }
+  .ring-sub { font-size: 0.55rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .remaining-info { font-size: 0.9rem; color: var(--text-mid); }
+  .remaining-info strong { font-size: 1.4rem; font-family: 'Playfair Display', serif; color: var(--teal-deep); display: block; }
+
+  .tabs { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+  .tab { padding: 10px 24px; border-radius: 50px; border: 2px solid transparent; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); }
+  .tab:hover { background: rgba(255,255,255,0.4); }
+  .tab.active { background: #fff; color: var(--teal-mid); border-color: var(--teal-light); box-shadow: 0 4px 16px rgba(10,74,74,0.15); }
+
+  .card { background: var(--card-bg); backdrop-filter: blur(18px); border: 1.5px solid var(--card-border); border-radius: 24px; padding: 30px; box-shadow: var(--shadow); margin-bottom: 20px; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; color: var(--teal-deep); margin-bottom: 6px; }
+  .card-sub { font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px; }
+
+  textarea, input[type=text], input[type=number] { width: 100%; padding: 14px 18px; border-radius: 14px; border: 2px solid var(--sea-glass); font-size: 0.95rem; font-family: 'DM Sans', sans-serif; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color 0.2s, box-shadow 0.2s; resize: vertical; }
+  textarea:focus, input:focus { border-color: var(--teal-mid); box-shadow: 0 0 0 4px rgba(20,160,133,0.1); }
+  label { font-size: 0.82rem; font-weight: 600; color: var(--teal-mid); text-transform: uppercase; letter-spacing: 1.2px; display: block; margin-bottom: 8px; }
+
+  .ai-box { background: linear-gradient(135deg, rgba(10,74,74,0.05), rgba(20,160,133,0.08)); border: 1.5px solid var(--card-border); border-radius: 16px; padding: 20px 22px; margin-top: 18px; font-size: 0.93rem; line-height: 1.75; color: var(--text-dark); white-space: pre-wrap; display: none; }
+  .ai-box.show { display: block; animation: fadeUp 0.3s ease; }
+  .ai-label { font-size: 0.75rem; font-weight: 700; color: var(--teal-bright); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .ai-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal-bright); animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+  .streaming-cursor::after { content: '▋'; animation: blink 0.7s step-end infinite; color: var(--teal-bright); }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .spinner-wrap { display: none; align-items: center; gap: 10px; margin-top: 14px; color: var(--text-light); font-size: 0.85rem; font-style: italic; }
+  .spinner-wrap.show { display: flex; }
+  .spinner { width: 20px; height: 20px; border: 3px solid var(--sea-glass); border-top-color: var(--teal-mid); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .log-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+  .log-item { display: flex; align-items: center; justify-content: space-between; background: var(--foam); border-radius: 12px; padding: 12px 18px; border-left: 4px solid var(--teal-bright); animation: fadeUp 0.3s ease both; }
+  .log-item-name { font-weight: 500; color: var(--text-dark); font-size: 0.95rem; flex: 1; margin-right: 12px; }
+  .log-item-cal { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--teal-mid); white-space: nowrap; }
+  .log-item-del { background: none; border: none; cursor: pointer; color: var(--coral); font-size: 1.1rem; padding: 2px 8px; border-radius: 6px; transition: background 0.15s; margin-left: 8px; }
+  .log-item-del:hover { background: rgba(255,107,107,0.1); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .two-col { display: grid; grid-template-columns: 1fr 130px; gap: 12px; align-items: end; }
+  .two-col-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  footer { text-align: center; padding: 30px 0 20px; color: rgba(255,255,255,0.45); font-size: 0.78rem; }
+
+  @media (max-width: 600px) {
+    .two-col, .two-col-equal { grid-template-columns: 1fr; }
+    .goal-bar { flex-direction: column; align-items: flex-start; }
+    .goal-controls { margin-left: 0; width: 100%; }
+    .goal-input { width: 100%; }
+    .logo { font-size: 2.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-blob blob1"></div>
+<div class="bg-blob blob2"></div>
+<div class="bg-blob blob3"></div>
+
+<div class="container">
+  <header>
+    <div class="logo">nouri<span>sh</span></div>
+    <div class="tagline">Fuel smarter · Eat better · Live well</div>
+  </header>
+
+  <div class="goal-bar">
+    <div>
+      <div class="goal-label">Daily Calorie Goal</div>
+      <div class="goal-display" id="goalDisplay">2,000 <span>kcal</span></div>
+    </div>
+    <div class="progress-section">
+      <div class="ring-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="33"/>
+          <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="207.3"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-sub">of goal</div>
+        </div>
+      </div>
+      <div class="remaining-info">
+        <strong id="consumedDisplay">0</strong>consumed today
+        <div id="remainingDisplay" style="margin-top:4px;font-size:0.82rem;color:var(--teal-bright);font-weight:600;"></div>
+      </div>
+    </div>
+    <div class="goal-controls">
+      <input class="goal-input" type="number" id="newGoalInput" placeholder="New goal" min="500" max="10000"/>
+      <button class="btn btn-primary" onclick="updateGoal()">Update</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('track')">🍽 Track Today</div>
+    <div class="tab" onclick="switchTab('mealplan')">📋 Meal Planner</div>
+  </div>
+
+  <!-- TRACK PANEL -->
+  <div class="panel active" id="panel-track">
+    <div class="card">
+      <div class="card-title">Describe What You Ate</div>
+      <div class="card-sub">Tell Claude about your meal in plain English — AI will estimate the calories for you.</div>
+      <label>What did you eat?</label>
+      <textarea id="foodDescription" rows="3" placeholder="e.g. I had a bowl of pasta with tomato sauce and two meatballs, a side salad with olive oil dressing, and a glass of orange juice…"></textarea>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeFood()">✨ Analyze with Claude</button>
+      </div>
+      <div class="spinner-wrap" id="analyzeSpinner"><div class="spinner"></div><span>Claude is analyzing your meal…</span></div>
+      <div class="ai-box" id="analyzeResult">
+        <div class="ai-label"><div class="ai-dot"></div> Claude's Nutrition Analysis</div>
+        <div id="analyzeText"></div>
+      </div>
+      <div id="addFromAiWrap" style="display:none;margin-top:12px;">
+        <button class="btn btn-secondary" onclick="addFromAI()">➕ Add estimated calories to log</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Manual Calorie Entry</div>
+      <div class="card-sub">Already know the calories? Log it directly without AI.</div>
+      <div class="two-col">
+        <div>
+          <label>Meal / Food Name</label>
+          <input type="text" id="manualName" placeholder="e.g. Chicken sandwich"/>
+        </div>
+        <div>
+          <label>Calories</label>
+          <input type="number" id="manualCals" placeholder="450" min="1"/>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addManual()" style="margin-top:14px;">Add to Log</button>
+    </div>
+
+    <div class="card" id="logCard" style="display:none;">
+      <div class="card-title">Today's Food Log</div>
+      <ul class="log-list" id="logList"></ul>
+      <div style="margin-top:16px;padding-top:14px;border-top:1.5px solid var(--sea-glass);display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.85rem;color:var(--text-light);font-weight:600;text-transform:uppercase;letter-spacing:1.2px;">Total</span>
+        <span style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--teal-deep);" id="totalDisplay">0 <span style="font-size:0.9rem;font-family:'DM Sans',sans-serif;color:var(--text-light);">kcal</span></span>
+      </div>
+      <button class="btn btn-secondary" onclick="clearLog()" style="margin-top:12px;font-size:0.8rem;padding:7px 16px;">Clear Log</button>
+    </div>
+  </div>
+
+  <!-- MEAL PLAN PANEL -->
+  <div class="panel" id="panel-mealplan">
+    <div class="card">
+      <div class="card-title">College Student Meal Planner</div>
+      <div class="card-sub">Budget-friendly, nutritious weekly meals built around your calorie goal — powered by Claude AI.</div>
+      <label>Target Daily Calories</label>
+      <input type="number" id="planCals" placeholder="e.g. 2000" min="1000" max="5000"/>
+      <div class="two-col-equal" style="margin-top:12px;">
+        <div>
+          <label>Weekly Budget (optional)</label>
+          <input type="text" id="planBudget" placeholder="e.g. $50/week"/>
+        </div>
+        <div>
+          <label>Dietary Preference</label>
+          <input type="text" id="planDiet" placeholder="e.g. vegetarian, no pork…"/>
+        </div>
+      </div>
+      <button class="btn btn-gold" id="planBtn" onclick="generateMealPlan()" style="margin-top:18px;width:100%;font-size:1rem;padding:14px;">🥗 Generate My Meal Plan</button>
+      <div class="spinner-wrap" id="planSpinner"><div class="spinner"></div><span>Claude is building your personalized meal plan…</span></div>
+      <div class="ai-box" id="planResult">
+        <div class="ai-label"><div class="ai-dot"></div> Your Personalized Meal Plan</div>
+        <div id="planText"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made with 💚 for your health journey · Nourish · Powered by Claude AI</footer>
+</div>
+
+<script>
+  let calorieGoal = 2000;
+  let foodLog = [];
+  let aiEstimatedCals = 0;
+
+  function updateProgress() {
+    const total = foodLog.reduce((s, i) => s + i.cals, 0);
+    const pct = Math.min(total / calorieGoal, 1);
+    const fill = document.getElementById('ringFill');
+    fill.style.strokeDashoffset = 207.3 * (1 - pct);
+    fill.style.stroke = pct > 0.95 ? '#ff6b6b' : pct > 0.75 ? '#f0c040' : 'var(--teal-bright)';
+    document.getElementById('ringPct').textContent = Math.round(pct * 100) + '%';
+    document.getElementById('consumedDisplay').textContent = total.toLocaleString();
+    const rem = calorieGoal - total;
+    const remEl = document.getElementById('remainingDisplay');
+    if (rem > 0) { remEl.textContent = rem.toLocaleString() + ' kcal remaining'; remEl.style.color = 'var(--teal-bright)'; }
+    else { remEl.textContent = Math.abs(rem).toLocaleString() + ' kcal over goal'; remEl.style.color = 'var(--coral)'; }
+  }
+
+  function updateGoal() {
+    const val = parseInt(document.getElementById('newGoalInput').value);
+    if (!val || val < 500) { alert('Please enter a valid calorie goal (min 500).'); return; }
+    calorieGoal = val;
+    document.getElementById('goalDisplay').innerHTML = val.toLocaleString() + ' <span>kcal</span>';
+    document.getElementById('newGoalInput').value = '';
+    updateProgress();
+  }
+
+  function renderLog() {
+    const list = document.getElementById('logList');
+    list.innerHTML = '';
+    document.getElementById('logCard').style.display = foodLog.length === 0 ? 'none' : 'block';
+    foodLog.forEach((item, i) => {
+      const li = document.createElement('li');
+      li.className = 'log-item';
+      li.innerHTML = `<span class="log-item-name">${item.name}</span><span style="display:flex;align-items:center;gap:10px;"><span class="log-item-cal">${item.cals} kcal</span><button class="log-item-del" onclick="removeItem(${i})">✕</button></span>`;
+      list.appendChild(li);
+    });
+    const total = foodLog.reduce((s, i) => s + i.cals, 0);
+    document.getElementById('totalDisplay').innerHTML = total.toLocaleString() + ' <span style="font-size:0.9rem;font-family:\'DM Sans\',sans-serif;color:var(--text-light);">kcal</span>';
+    updateProgress();
+  }
+
+  function removeItem(i) { foodLog.splice(i, 1); renderLog(); }
+  function clearLog() { if (!confirm('Clear today\'s food log?')) return; foodLog = []; renderLog(); }
+
+  function addManual() {
+    const name = document.getElementById('manualName').value.trim();
+    const cals = parseInt(document.getElementById('manualCals').value);
+    if (!name || !cals || cals < 1) { alert('Please enter a meal name and calorie amount.'); return; }
+    foodLog.push({ name, cals });
+    document.getElementById('manualName').value = '';
+    document.getElementById('manualCals').value = '';
+    renderLog();
+  }
+
+  function addFromAI() {
+    if (!aiEstimatedCals) return;
+    const raw = document.getElementById('foodDescription').value.trim();
+    const name = raw.length > 50 ? raw.substring(0, 47) + '…' : raw;
+    foodLog.push({ name, cals: aiEstimatedCals });
+    document.getElementById('addFromAiWrap').style.display = 'none';
+    document.getElementById('analyzeResult').classList.remove('show');
+    document.getElementById('foodDescription').value = '';
+    aiEstimatedCals = 0;
+    renderLog();
+  }
+
+  // ── Claude API with streaming ──────────────────────────
+  async function streamClaude({ system, user, spinnerId, boxId, textId, btnId, onComplete }) {
+    const spinner = document.getElementById(spinnerId);
+    const box = document.getElementById(boxId);
+    const textEl = document.getElementById(textId);
+    const btn = btnId ? document.getElementById(btnId) : null;
+
+    spinner.classList.add('show');
+    box.classList.remove('show');
+    textEl.textContent = '';
+    if (btn) btn.disabled = true;
+
+    let fullText = '';
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          stream: true,
+          system,
+          messages: [{ role: 'user', content: user }]
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+      }
+
+      spinner.classList.remove('show');
+      box.classList.add('show');
+      textEl.classList.add('streaming-cursor');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+              fullText += parsed.delta.text;
+              textEl.textContent = fullText;
+            }
+          } catch {}
+        }
+      }
+      textEl.classList.remove('streaming-cursor');
+      if (onComplete) onComplete(fullText);
+
+    } catch (e) {
+      spinner.classList.remove('show');
+      textEl.classList.remove('streaming-cursor');
+      textEl.textContent = '⚠️ Error: ' + e.message;
+      box.classList.add('show');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  async function analyzeFood() {
+    const desc = document.getElementById('foodDescription').value.trim();
+    if (!desc) { alert('Please describe what you ate first.'); return; }
+    aiEstimatedCals = 0;
+    document.getElementById('addFromAiWrap').style.display = 'none';
+    await streamClaude({
+      system: `You are a knowledgeable nutrition expert. When given a description of food, estimate the total calories with a clear per-item breakdown. Be practical and realistic with portion sizes. Always end your response with a line in exactly this format: "TOTAL ESTIMATE: X calories" (where X is a single integer, nothing else on that line).`,
+      user: `Please analyze the approximate calorie content of this meal: ${desc}`,
+      spinnerId: 'analyzeSpinner', boxId: 'analyzeResult', textId: 'analyzeText', btnId: 'analyzeBtn',
+      onComplete(text) {
+        const match = text.match(/TOTAL ESTIMATE:\s*(\d+)/i);
+        if (match) {
+          aiEstimatedCals = parseInt(match[1]);
+          document.getElementById('addFromAiWrap').style.display = 'block';
+        }
+      }
+    });
+  }
+
+  async function generateMealPlan() {
+    const cals = document.getElementById('planCals').value || calorieGoal;
+    const budget = document.getElementById('planBudget').value.trim() || '$50/week';
+    const diet = document.getElementById('planDiet').value.trim() || 'no specific restrictions';
+    await streamClaude({
+      system: `You are a budget nutritionist specializing in practical, affordable meal planning for college students. You create plans that are realistic, delicious, and easy to make with basic cooking skills and minimal equipment. Format your response clearly with emoji section headers.`,
+      user: `Create a practical 5-day college student meal plan with:
+- Target: ${cals} calories/day
+- Weekly grocery budget: ${budget}
+- Dietary preference: ${diet}
+
+Include:
+1. 🛒 GROCERY LIST — cheap, versatile staples with estimated cost per item
+2. 📅 5-DAY MEAL PLAN — breakfast, lunch, dinner, and a snack each day with approximate calorie counts
+3. 🍳 2 EASY RECIPES — simple step-by-step recipes using groceries from the list
+
+Keep it realistic for a busy student with limited time, cooking skills, and a small budget.`,
+      spinnerId: 'planSpinner', boxId: 'planResult', textId: 'planText', btnId: 'planBtn',
+      onComplete: null
+    });
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['track','mealplan'][i] === tab));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
